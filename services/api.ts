@@ -25,5 +25,22 @@ export const api = {
       throw new Error(errorData.detail || 'Failed to create member');
     }
     return response.json();
+  },
+
+  // Update existing member
+  updateMember: async (id: string | number, memberData: Omit<Member, 'id'>): Promise<Member> => {
+    const response = await fetch(`${API_BASE_URL}/members/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(memberData),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Failed to update member');
+    }
+    return response.json();
   }
 };

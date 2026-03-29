@@ -32,7 +32,8 @@ export const MemberModal: React.FC<MemberModalProps> = ({
     setIsSaving(true);
     try {
       if (editingMember) {
-        setMembers(prev => prev.map(m => m.id === editingMember.id ? { ...m, ...memberForm } as Member : m));
+        const updated = await api.updateMember(editingMember.id, memberForm as Omit<Member, 'id'>);
+        setMembers(prev => prev.map(m => m.id === editingMember.id ? updated : m));
         setIsMemberModalOpen(false);
       } else {
         const newMember = await api.createMember(memberForm as Omit<Member, 'id'>);
