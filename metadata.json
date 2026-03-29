@@ -1,0 +1,5 @@
+{
+  "name": "MCA Dept. Auto-Greeter",
+  "description": "Automated greetings, announcements, and certificate generation system for the MCA Department with AI-powered template suggestions.",
+  "requestFramePermissions": []
+}
