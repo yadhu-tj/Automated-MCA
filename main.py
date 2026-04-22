@@ -9,6 +9,7 @@ from sqlalchemy import Column, String
 from dotenv import load_dotenv
 
 from database import engine, Base, get_db
+import models
 
 from google import genai
 from google.genai import types
@@ -16,7 +17,7 @@ from google.genai import types
 load_dotenv()
 
 # Create tables
-Base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="MCA Dept. Auto-Greeter API")
 
@@ -33,20 +34,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# SQLAlchemy Models
-class DBMember(Base):
-    __tablename__ = "members"
-
-    id = Column(String, primary_key=True, index=True)
-    name = Column(String)
-    email = Column(String, unique=True, index=True)
-    role = Column(String)
-    dob = Column(String)
-    photoUrl = Column(String)
-    whatsappNumber = Column(String, nullable=True)
-    department = Column(String)
-    year = Column(String, nullable=True)
 
 # Pydantic Models
 class Member(BaseModel):
@@ -69,7 +56,7 @@ async def get_members(db: Session = Depends(get_db)):
     """
     Fetch the complete list of members.
     """
-    members = db.query(DBMember).all()
+    members = db.query(models.DBMember).all()
     return members
 
 class LoginRequest(BaseModel):
@@ -143,7 +130,7 @@ async def create_member(member: Member, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Name and email are required.")
 
     # Check if email exists
-    db_member = db.query(DBMember).filter(DBMember.email == member.email).first()
+    db_member = db.query(models.DBMember).filter(models.DBMember.email == member.email).first()
     if db_member:
          raise HTTPException(status_code=400, detail="Email already registered")
 
@@ -153,7 +140,7 @@ async def create_member(member: Member, db: Session = Depends(get_db)):
     if "id" not in member_dict or not member_dict["id"]:
         member_dict["id"] = str(uuid.uuid4())
 
-    db_member = DBMember(**member_dict)
+    db_member = models.DBMember(**member_dict)
     db.add(db_member)
     db.commit()
     db.refresh(db_member)
