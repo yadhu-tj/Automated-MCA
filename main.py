@@ -5,11 +5,11 @@ from typing import List, Optional
 import uuid
 import os
 from sqlalchemy.orm import Session
-from sqlalchemy import Column, String
 from dotenv import load_dotenv
 
 from database import engine, Base, get_db
 import models
+import schemas
 
 from google import genai
 from google.genai import types
@@ -35,23 +35,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Pydantic Models
-class Member(BaseModel):
-    id: Optional[str] = None
-    name: str
-    email: str
-    role: str
-    dob: str
-    photoUrl: str
-    whatsappNumber: Optional[str] = None
-    department: str
-    year: Optional[str] = None
 
-    class Config:
-        from_attributes = True
-
-
-@app.get("/api/members", response_model=List[Member])
+@app.get("/api/members", response_model=List[schemas.Member])
 async def get_members(db: Session = Depends(get_db)):
     """
     Fetch the complete list of members.
@@ -120,25 +105,20 @@ async def generate_greeting(request: GenerateGreetingRequest):
         print(f"Error calling Gemini: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate AI content")
 
-@app.post("/api/members", response_model=Member)
-async def create_member(member: Member, db: Session = Depends(get_db)):
+@app.post("/api/members", response_model=schemas.Member)
+async def create_member(member: schemas.MemberCreate, db: Session = Depends(get_db)):
     """
     Add a new member.
     """
-    # Simple validation (you'd typically do more robust checking)
-    if not member.name or not member.email:
-        raise HTTPException(status_code=400, detail="Name and email are required.")
-
     # Check if email exists
     db_member = db.query(models.DBMember).filter(models.DBMember.email == member.email).first()
     if db_member:
          raise HTTPException(status_code=400, detail="Email already registered")
 
-    member_dict = member.model_dump(exclude_unset=True)
+    member_dict = member.model_dump()
 
-    # Generate an ID if not provided
-    if "id" not in member_dict or not member_dict["id"]:
-        member_dict["id"] = str(uuid.uuid4())
+    # Generate an ID
+    member_dict["id"] = str(uuid.uuid4())
 
     db_member = models.DBMember(**member_dict)
     db.add(db_member)
