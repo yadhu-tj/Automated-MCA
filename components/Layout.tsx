@@ -42,7 +42,25 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </div>
                   </Link>
 
-                  {/* Admin Link Removed */}
+                  {localStorage.getItem('adminToken') ? (
+                    <Link
+                      to="/admin"
+                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/admin')}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        Admin Dashboard
+                      </div>
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/login"
+                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/login')}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        Login
+                      </div>
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
@@ -75,7 +93,23 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 Public Portal
               </Link>
 
-              {/* Admin Link Removed */}
+              {localStorage.getItem('adminToken') ? (
+                <Link
+                  to="/admin"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-gray-300 hover:bg-mca-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                >
+                  Admin Dashboard
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-gray-300 hover:bg-mca-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                >
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         )}
