@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { PublicHome } from './pages/PublicHome';
 import { AdminPanel } from './pages/AdminPanel';
 import { Login } from './pages/Login';
+import { CertificatePage } from './pages/CertificatePage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
@@ -33,6 +34,9 @@ function App() {
             </ProtectedRoute>
           } 
         />
+
+        {/* CERTIFICATE VIEW PAGE */}
+        <Route path="/certificate/:achievementId" element={<CertificatePage />} />
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />

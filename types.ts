@@ -40,6 +40,15 @@ export interface Template {
   backgroundImage?: string;
 }
 
+export interface DepartmentEvent {
+  id: string;
+  title: string;
+  date: string;
+  type: string;
+  description?: string;
+  location?: string;
+}
+
 export interface Achievement {
   id: string;
   memberId: string;
@@ -48,6 +57,10 @@ export interface Achievement {
   date: string;
   status: ApprovalStatus;
   certificateGenerated: boolean;
+  certificateFileName?: string;
+  certificateFilePath?: string;
+  certificateMimeType?: string;
+  certificateFileData?: string;
 }
 
 export interface Log {
