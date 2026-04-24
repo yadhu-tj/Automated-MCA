@@ -1,36 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MCA Greetings System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              serif: ['Playfair Display', 'serif'],
-            },
-            colors: {
-              mca: {
-                50: '#f0f9ff',
-                100: '#e0f2fe',
-                500: '#0ea5e9',
-                600: '#0284c7',
-                800: '#075985',
-                900: '#0c4a6e',
-              }
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UCC MCA Department Portal</title>
+  <meta name="description" content="Welcome to UCC MCA Department — automated greetings, achievements, and event management portal." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+          },
+          colors: {
+            mca: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+              950: '#082f49',
             }
+          },
+          keyframes: {
+            'slide-left': {
+              '0%': { transform: 'translateX(0)' },
+              '100%': { transform: 'translateX(-50%)' }
+            },
+            'fade-up': {
+              '0%': { opacity: '0', transform: 'translateY(30px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            },
+            'glow-pulse': {
+              '0%, 100%': { boxShadow: '0 0 15px rgba(14,165,233,0.15)' },
+              '50%': { boxShadow: '0 0 30px rgba(14,165,233,0.35)' }
+            },
+            'float': {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-8px)' }
+            }
+          },
+          animation: {
+            'slide-left': 'slide-left 30s linear infinite',
+            'fade-up': 'fade-up 0.8s ease-out forwards',
+            'glow-pulse': 'glow-pulse 3s ease-in-out infinite',
+            'float': 'float 6s ease-in-out infinite'
           }
         }
       }
-    </script>
+    }
+  </script>
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+    /* Parallax sections */
+    .parallax-bg {
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    /* Glow card effect */
+    .glow-card {
+      position: relative;
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease;
+    }
+    .glow-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(14,165,233,0), rgba(14,165,233,0));
+      z-index: -1;
+      transition: background 0.4s ease, opacity 0.4s ease;
+      opacity: 0;
+    }
+    .glow-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 20px 60px -15px rgba(14, 165, 233, 0.25),
+                  0 0 40px -10px rgba(14, 165, 233, 0.15);
+    }
+    .glow-card:hover::before {
+      background: linear-gradient(135deg, rgba(14,165,233,0.4), rgba(56,189,248,0.2), rgba(14,165,233,0.4));
+      opacity: 1;
+    }
+
+    /* Greeting slider */
+    .greeting-track {
+      display: flex;
+      width: max-content;
+    }
+    .greeting-track:hover {
+      animation-play-state: paused;
+    }
+
+    /* Fade-up stagger */
+    .fade-up-1 { animation-delay: 0.1s; }
+    .fade-up-2 { animation-delay: 0.2s; }
+    .fade-up-3 { animation-delay: 0.3s; }
+    .fade-up-4 { animation-delay: 0.4s; }
+
+    /* Glass morphism */
+    .glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+  </style>
 </head>
-  <body class="bg-slate-50 text-slate-900 antialiased">
-    <div id="root"></div>
+
+<body class="bg-slate-50 text-slate-900 antialiased">
+  <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
+
 </html>
