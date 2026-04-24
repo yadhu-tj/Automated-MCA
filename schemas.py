@@ -19,3 +19,8 @@ from pydantic import ConfigDict
 class Member(MemberBase):
     model_config = ConfigDict(from_attributes=True)
     id: str
+class Member(MemberBase):
+    id: str
+
+    class Config:
+        from_attributes = True
