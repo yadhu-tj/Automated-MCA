@@ -1,20 +1,26 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { api } from "../services/api";
 
 export function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Dummy Admin Credentials
-    if (email === "admin@mca.com" && password === "1234") {
-      localStorage.setItem("adminToken", "true");
-      navigate("/admin"); // Redirect after login
-    } else {
-      alert("Invalid admin credentials!");
+    try {
+      const response = await api.loginAdmin(email, password);
+
+      if (response && response.token) {
+        localStorage.setItem("adminToken", response.token);
+        navigate("/admin"); // Redirect after login
+      } else {
+        alert("Invalid admin credentials!");
+      }
+    } catch (error) {
+       alert("Invalid admin credentials!");
     }
   };
 

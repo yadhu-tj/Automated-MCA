@@ -25,8 +25,26 @@ export const PublicHome: React.FC = () => {
     fetchMembers();
   }, []);
 
-  // For now, using empty achievements since constants were deleted
-  const publicAchievements: Achievement[] = [];
+  const [publicAchievements, setPublicAchievements] = useState<Achievement[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchAdditionalData = async () => {
+      try {
+        if (api.getAchievements) {
+          const achievements = await api.getAchievements();
+          setPublicAchievements(achievements);
+        }
+        if (api.getUpcomingEvents) {
+          const events = await api.getUpcomingEvents();
+          setUpcomingEvents(events);
+        }
+      } catch (error) {
+        console.error("Error fetching additional data:", error);
+      }
+    };
+    fetchAdditionalData();
+  }, []);
   
   // Real "Today's Birthdays" logic against real member DB
   const today = new Date();
@@ -38,12 +56,6 @@ export const PublicHome: React.FC = () => {
     const [year, month, day] = m.dob.split('-');
     return parseInt(month) === currentMonth && parseInt(day) === currentDay;
   });
-
-  // Upcoming events placeholder
-  const upcomingEvents = [
-    { title: 'Diwali Celebration', date: '2025-11-01', type: 'Festival' },
-    { title: 'Guest Lecture: Cloud Computing', date: '2025-11-05', type: 'Academic' },
-  ];
 
   const getMemberName = (id: string) => members.find(m => String(m.id) === String(id))?.name || 'Unknown Member';
 
