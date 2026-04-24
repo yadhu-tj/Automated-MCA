@@ -20,10 +20,11 @@
 
 ### Tech Stack
 
-- **Frontend**: React 19.2.1 with TypeScript (93.7%)
+- **Frontend**: React 19.2.1 with TypeScript
+- **Backend**: Python with FastAPI and SQLAlchemy
 - **Build Tool**: Vite 6.2.0
-- **Styling**: CSS 2.8%, HTML 2.5%
-- **AI Integration**: Google Generative AI (@google/genai)
+- **Database**: SQLite
+- **AI Integration**: Google Generative AI (`google-genai` Python SDK)
 - **Routing**: React Router DOM 7.10.1
 - **UI Icons**: Lucide React 0.556.0
 
@@ -60,6 +61,7 @@ The application uses TypeScript interfaces for type safety:
 ### Prerequisites
 
 - **Node.js** (v18 or higher recommended)
+- **Python** (v3.9 or higher recommended)
 - Gemini API key for AI features
 
 ### Installation
@@ -70,25 +72,42 @@ The application uses TypeScript interfaces for type safety:
    cd Automated-MCA
    ```
 
-2. **Install dependencies**:
+2. **Install Frontend Dependencies**:
    ```bash
    npm install
    ```
 
-3. **Configure Environment**:
-   - Create a `.env.local` file in the project root
-   - Add your Gemini API key:
+3. **Install Backend Dependencies**:
+   ```bash
+   pip install fastapi uvicorn sqlalchemy pydantic python-dotenv google-genai
+   ```
+   *(Alternatively, if a `requirements.txt` is added, run `pip install -r requirements.txt`)*
+
+4. **Configure Environment**:
+   - Create a `.env` file in the project root for backend:
+     ```env
+     GEMINI_API_KEY=your_gemini_api_key_here
      ```
-     VITE_GEMINI_API_KEY=your_gemini_api_key_here
+   - (Optional) Create a `.env.local` file for frontend if you need to override the API URL:
+     ```env
+     VITE_API_URL=http://localhost:8000/api
      ```
 
-4. **Run the application**:
+5. **Run the Application**:
+
+   **Start the Backend Server**:
+   ```bash
+   uvicorn main:app --reload
+   ```
+   The API will be available at `http://localhost:8000`
+
+   **Start the Frontend Server**:
    ```bash
    npm run dev
    ```
-   The app will be available at `http://localhost:5173`
+   The frontend app will be available at `http://localhost:3000`
 
-### Available Scripts
+### Available Scripts (Frontend)
 
 - `npm run dev` - Start the development server with hot module reloading
 - `npm run build` - Build the application for production
