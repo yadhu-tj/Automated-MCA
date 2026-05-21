@@ -2,6 +2,8 @@ import React from 'react';
 import { Cake, Sparkles, Send } from 'lucide-react';
 import { Member, Template, EventCategory } from '../../types';
 import { resolveTemplate } from '../../utils/templateResolver';
+import { getMediaUrl } from '../../services/api';
+
 
 interface BirthdaysWidgetProps {
   todaysBirthdays: Member[];
@@ -68,10 +70,11 @@ export const BirthdaysWidget: React.FC<BirthdaysWidgetProps> = ({ todaysBirthday
                   {member.photoUrl ? (
                     <div className="relative flex-shrink-0">
                       <img
-                        src={member.photoUrl}
+                        src={getMediaUrl(member.photoUrl)}
                         alt={member.name}
                         className="w-16 h-16 rounded-2xl object-cover ring-4 ring-pink-50 shadow-md group-hover:scale-105 transition-transform duration-300"
                       />
+
                       <span className="absolute -bottom-1 -right-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full p-1 shadow-md">
                         <Cake className="w-3.5 h-3.5" />
                       </span>

@@ -2,11 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 
 const SLIDESHOW_IMAGES = [
-  'https://images.unsplash.com/photo-1523050854058-8df90110c476?w=1600&q=80',
-  'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1600&q=80',
-  'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1600&q=80',
-  'https://images.unsplash.com/photo-1562774053-701939374585?w=1600&q=80',
+  '/images/mca_building.jpg',
+  '/images/mca_lab.jpg',
 ];
+
 
 const SLIDE_INTERVAL = 5000; // ms between slides
 
