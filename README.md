@@ -41,53 +41,32 @@
 
 ```
 Automated-MCA/
-├── index.html              # HTML entry + Tailwind config + custom CSS
-├── index.tsx               # React DOM mount
-├── index.css               # Base reset styles
-├── App.tsx                 # Router setup (HashRouter)
-├── types.ts                # Shared TypeScript interfaces & enums
-├── vite.config.ts          # Vite dev-server & alias config
-├── main.py                 # FastAPI backend (all API routes)
-├── database.py             # SQLAlchemy engine & session
-├── models.py               # ORM models (Member, Event, Achievement, Template)
-├── schemas.py              # Pydantic request/response schemas
-├── requirement.txt         # Python dependencies
-├── package.json            # Node dependencies & scripts
+├── backend/                 # FastAPI Backend Application
+│   ├── core/                # Auth, configurations, database initialization
+│   ├── routers/             # API route handlers
+│   ├── backend_services/    # File storage, greetings, members logic
+│   ├── uploads/             # Saved certificates & profile photos
+│   ├── main.py              # FastAPI main entry
+│   ├── database.py          # Beanie MongoDB client setup
+│   ├── models.py            # ODM Database models
+│   ├── schemas.py           # Pydantic validation schemas
+│   ├── test_main.py         # Pytest API test cases
+│   └── requirement.txt      # Python backend dependencies
 │
-├── pages/
-│   ├── PublicHome.tsx       # Landing page (hero, greetings, calendar, achievements)
-│   ├── AdminPanel.tsx       # Admin dashboard with tabbed management
-│   ├── Login.tsx            # Admin login form
-│   └── CertificatePage.tsx  # Certificate viewer
-│
-├── components/
-│   ├── Layout.tsx           # Navbar + footer wrapper
-│   ├── ProtectedRoute.tsx   # Auth guard for /admin
-│   ├── CertificatePreview.tsx
-│   ├── public/              # Public-facing components
-│   │   ├── HeroSection.tsx        # Parallax image slideshow hero
-│   │   ├── GreetingsWidget.tsx    # Sliding birthday & festival cards
-│   │   ├── DepartmentCalendar.tsx # Event list with date blocks
-│   │   └── AchievementWall.tsx    # Ranked achievement list
-│   └── admin/               # Admin dashboard components
-│       ├── MemberManager.tsx      # Member table + CSV import
-│       ├── MemberModal.tsx        # Add/Edit member form with photo upload
-│       ├── CalendarManager.tsx    # Event CRUD
-│       ├── AchievementManager.tsx # Achievement CRUD + certificate upload
-│       ├── TemplateManager.tsx    # Message templates
-│       └── GeneratorTab.tsx       # AI greeting generator
-│
-├── services/
-│   └── api.ts              # All fetch calls to the backend
-│
-├── utils/
-│   └── csvParser.ts         # CSV → Member[] parser
-│
-├── uploads/
-│   ├── certificates/        # Uploaded certificate files
-│   └── photos/              # Uploaded member profile photos
-│
-└── test_main.py             # Pytest API tests
+├── frontend/                # React (Vite) Frontend Application
+│   ├── components/          # Reusable UI widgets and pages components
+│   │   ├── admin/           # Admin panel managers
+│   │   └── public/          # Public-facing components (Birthdays, Calendar, etc.)
+│   ├── pages/               # Top-level routes (PublicHome, AdminPanel, Login, etc.)
+│   ├── services/            # Fetch client service modules (API & Gemini)
+│   ├── utils/               # CSV parser and template resolvers
+│   ├── public/              # Vite static assets (SVG, Favicons, etc.)
+│   ├── App.tsx              # Main routing container
+│   ├── index.tsx            # Application entry mount point
+│   ├── index.css            # Base Tailwind and custom styling rules
+│   ├── package.json         # Frontend Node dependencies & scripts
+│   ├── vite.config.ts       # Vite config + path aliases
+│   └── tsconfig.json        # TypeScript configurations
 ```
 
 ## Getting Started
@@ -98,7 +77,7 @@ Automated-MCA/
 - **Python** 3.9+ with **pip**
 - A Google Gemini API key (optional — AI features fall back to mock data without it)
 
-### Installation
+### Installation & Setup
 
 1. **Clone the repository**:
    ```bash
@@ -106,39 +85,41 @@ Automated-MCA/
    cd Automated-MCA
    ```
 
-2. **Install frontend dependencies**:
+2. **Frontend Setup**:
    ```bash
+   cd frontend
    npm install
    ```
 
-3. **Create & activate a Python virtual environment** (recommended):
+3. **Backend Setup**:
+   Open a separate terminal window/tab:
    ```bash
+   cd backend
    python -m venv venv
    # Windows
    venv\Scripts\activate
    # macOS / Linux
    source venv/bin/activate
-   ```
-
-4. **Install backend dependencies**:
-   ```bash
+   
    pip install -r requirement.txt
    ```
 
-5. **Configure environment variables**:
-   Create a `.env` file in the project root:
+4. **Configure environment variables**:
+   Create a `.env` file inside the `backend/` directory:
    ```env
    GEMINI_API_KEY=your_gemini_api_key_here
    ```
-   Optionally override the API URL for the frontend with a `.env.local`:
+   Optionally override the API URL for the frontend by creating a `.env` file inside the `frontend/` directory:
    ```env
    VITE_API_URL=http://localhost:8000/api
    ```
 
 ### Running the Application
 
-**Start the backend** (port 8000):
+**Start the Backend server** (port 8000):
 ```bash
+cd backend
+# Make sure your virtual env is active
 python main.py
 ```
 or
@@ -146,8 +127,9 @@ or
 uvicorn main:app --reload
 ```
 
-**Start the frontend** (port 3000):
+**Start the Frontend server** (port 3000):
 ```bash
+cd frontend
 npm run dev
 ```
 
@@ -160,13 +142,13 @@ Open **http://localhost:3000** in your browser.
 
 ### Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start Vite dev server with HMR |
-| `npm run build` | Production build |
-| `npm run preview` | Preview production build |
-| `python main.py` | Start FastAPI with auto-reload |
-| `pytest test_main.py` | Run backend API tests |
+| Directory | Command | Description |
+|-----------|---------|-------------|
+| `/frontend` | `npm run dev` | Start Vite dev server with HMR |
+| `/frontend` | `npm run build` | Compile production bundle |
+| `/frontend` | `npm run preview` | Preview production build |
+| `/backend` | `python main.py` | Start FastAPI with uvicorn |
+| `/backend` | `pytest` | Run backend unit tests |
 
 ## API Endpoints
 
