@@ -4,6 +4,8 @@ import { Sparkles } from 'lucide-react';
 const SLIDESHOW_IMAGES = [
   '/images/mca_building.jpg',
   '/images/mca_lab.jpg',
+  '/images/mca_coding.png',
+  '/images/mca_seminar.png',
 ];
 
 
