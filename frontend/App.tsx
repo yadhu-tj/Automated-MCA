@@ -2,6 +2,7 @@ import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { PublicHome } from './pages/PublicHome';
+import { AboutPage } from './pages/AboutPage';
 import { AdminPanel } from './pages/AdminPanel';
 import { CertificatePage } from './pages/CertificatePage';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -17,6 +18,16 @@ function App() {
           element={
             <Layout>
               <PublicHome />
+            </Layout>
+          } 
+        />
+
+        {/* ABOUT PAGE */}
+        <Route 
+          path="/about" 
+          element={
+            <Layout>
+              <AboutPage />
             </Layout>
           } 
         />

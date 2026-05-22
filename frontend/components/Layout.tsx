@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { GraduationCap, Home, Menu, X } from 'lucide-react';
+import { GraduationCap, Home, Menu, X, Info } from 'lucide-react';
 import { LoginModal } from './LoginModal';
 
 interface LayoutProps {
@@ -31,100 +31,79 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Navigation */}
-      <nav className="bg-mca-900 shadow-lg sticky top-0 z-50">
+      <nav className="bg-mca-900 shadow-lg sticky top-0 z-50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
+            <div className="flex items-center justify-between w-full">
               <div className="flex-shrink-0">
                 <Link to="/" className="flex items-center gap-2 text-white font-bold text-xl">
                   <GraduationCap className="h-8 w-8 text-sky-400" />
-                  <span>MCA Dept.</span>
+                  <span>UCC MCA Dept.</span>
                 </Link>
               </div>
 
-              {/* Desktop Menu */}
-              <div className="hidden md:block">
-                <div className="ml-10 flex items-baseline space-x-4">
-                  <Link
-                    to="/"
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/')}`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Home className="h-4 w-4" />
-                      Public Portal
-                    </div>
-                  </Link>
-
-                  {localStorage.getItem('adminToken') ? (
-                    <Link
-                      to="/admin"
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/admin')}`}
-                    >
-                      <div className="flex items-center gap-2">
-                        Admin Dashboard
-                      </div>
-                    </Link>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={openLoginModal}
-                      className="px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-300 hover:bg-mca-800 hover:text-white"
-                    >
-                      <div className="flex items-center gap-2">
-                        Login
-                      </div>
-                    </button>
-                  )}
-                </div>
+              {/* Menu & Info Button on Right */}
+              <div className="flex items-center gap-4">
+                <span className="text-gray-400 text-xs italic">v1.1</span>
+                <button
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="bg-mca-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-mca-700 focus:outline-none transition-all"
+                  aria-label="Toggle menu"
+                >
+                  {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                </button>
               </div>
-            </div>
-
-            <div className="hidden md:block">
-              <span className="text-gray-400 text-xs italic pr-4">v1.1</span>
-            </div>
-
-            {/* Mobile Toggle Button */}
-            <div className="-mr-2 flex md:hidden">
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="bg-mca-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-mca-700 focus:outline-none"
-              >
-                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
             </div>
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Dropdown Menu (Floating on all sizes) */}
         {isMobileMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-mca-900">
-              <Link
-                to="/"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-gray-300 hover:bg-mca-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-              >
-                Public Portal
-              </Link>
+          <div className="absolute right-4 sm:right-6 lg:right-8 top-16 w-56 mt-1 origin-top-right rounded-xl bg-mca-950/95 backdrop-blur-md border border-mca-800 shadow-2xl ring-1 ring-black ring-opacity-5 z-50 p-2 space-y-1">
+            <Link
+              to="/"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${location.pathname === '/'
+                ? 'bg-mca-700 text-white shadow-md'
+                : 'text-slate-300 hover:bg-mca-800 hover:text-white'
+                }`}
+            >
+              <Home className="h-4 w-4 text-sky-400" />
+              Public Portal
+            </Link>
 
-              {localStorage.getItem('adminToken') ? (
-                <Link
-                  to="/admin"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-gray-300 hover:bg-mca-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-                >
-                  Admin Dashboard
-                </Link>
-              ) : (
-                <button
-                  type="button"
-                  onClick={openLoginModal}
-                  className="text-gray-300 hover:bg-mca-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-                >
-                  Login
-                </button>
-              )}
-            </div>
+            <Link
+              to="/about"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${location.pathname === '/about'
+                ? 'bg-mca-700 text-white shadow-md'
+                : 'text-slate-300 hover:bg-mca-800 hover:text-white'
+                }`}
+            >
+              <Info className="h-4 w-4 text-sky-400" />
+              About Dept
+            </Link>
+
+            {localStorage.getItem('adminToken') ? (
+              <Link
+                to="/admin"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${location.pathname === '/admin'
+                  ? 'bg-mca-700 text-white shadow-md'
+                  : 'text-slate-300 hover:bg-mca-800 hover:text-white'
+                  }`}
+              >
+                Admin Dashboard
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={openLoginModal}
+                className="w-full text-left flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-300 hover:bg-mca-800 hover:text-white transition-colors"
+              >
+                Login
+              </button>
+            )}
           </div>
         )}
       </nav>

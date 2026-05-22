@@ -151,6 +151,23 @@ export const api = {
     }
   },
 
+  uploadTemplateBackground: async (file: File): Promise<{ backgroundImage: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await fetch(`${API_BASE_URL}/templates/upload-background`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+      },
+      body: formData,
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || 'Failed to upload template background');
+    }
+    return response.json();
+  },
+
   generateGreeting: async (category: string, recipientRole: string, context: string): Promise<{ title: string; message: string; tone: string } | null> => {
     try {
       const response = await fetch(`${API_BASE_URL}/ai/generate-greeting`, {
