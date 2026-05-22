@@ -1,0 +1,16 @@
+# Core Dependencies
+fastapi==0.136.0
+uvicorn==0.46.0
+pydantic==2.13.3
+python-dotenv==1.2.2
+python-multipart==0.0.26
+email-validator==2.3.0
+google-genai==1.73.1
+protobuf==7.34.1
+motor==3.6.0
+beanie==1.28.0
+
+# Testing and Development Dependencies
+pytest==9.0.3
+mongomock-motor==0.0.31
+anyio==4.13.0

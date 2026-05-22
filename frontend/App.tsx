@@ -1,0 +1,55 @@
+import React from 'react';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Layout } from './components/Layout';
+import { PublicHome } from './pages/PublicHome';
+import { AboutPage } from './pages/AboutPage';
+import { AdminPanel } from './pages/AdminPanel';
+import { CertificatePage } from './pages/CertificatePage';
+import { ProtectedRoute } from './components/ProtectedRoute';
+
+function App() {
+  return (
+    <HashRouter>
+      <Routes>
+
+        {/* PUBLIC PAGE */}
+        <Route 
+          path="/" 
+          element={
+            <Layout>
+              <PublicHome />
+            </Layout>
+          } 
+        />
+
+        {/* ABOUT PAGE */}
+        <Route 
+          path="/about" 
+          element={
+            <Layout>
+              <AboutPage />
+            </Layout>
+          } 
+        />
+
+        {/* ADMIN PAGE (PROTECTED) */}
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute>
+              <AdminPanel />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* CERTIFICATE VIEW PAGE */}
+        <Route path="/certificate/:achievementId" element={<CertificatePage />} />
+
+        {/* FALLBACK */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </HashRouter>
+  );
+}
+
+export default App;

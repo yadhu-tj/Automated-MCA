@@ -24,3 +24,11 @@ dist-ssr
 *.sw?
 __pycache__
 *.db
+
+# Virtual Environment
+venv/
+.venv/
+
+# Uploads
+backend/uploads/
+
