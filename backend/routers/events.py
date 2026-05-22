@@ -3,6 +3,7 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException, Depends
 from core.auth import get_current_admin
+from database import to_object_id
 
 import models
 import schemas
@@ -37,7 +38,6 @@ async def create_event(event: schemas.EventCreate, admin: dict = Depends(get_cur
     logger.info("Create event request received title=%s date=%s type=%s", event.title, event.date, event.type)
 
     event_dict = event.model_dump()
-    event_dict["id"] = str(uuid.uuid4())
 
     db_event = models.DBDepartmentEvent(**event_dict)
     await db_event.insert()
@@ -51,7 +51,12 @@ async def update_event(event_id: str, event: schemas.EventCreate, admin: dict = 
     """
     logger.info("Update event request received id=%s title=%s date=%s type=%s", event_id, event.title, event.date, event.type)
 
-    db_event = await models.DBDepartmentEvent.find_one(models.DBDepartmentEvent.id == event_id)
+    obj_id = to_object_id(event_id)
+    if not obj_id:
+        logger.warning("Update event rejected: invalid id=%s", event_id)
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    db_event = await models.DBDepartmentEvent.get(obj_id)
     if not db_event:
         logger.warning("Update event rejected: event not found id=%s", event_id)
         raise HTTPException(status_code=404, detail="Event not found")
@@ -72,7 +77,12 @@ async def delete_event(event_id: str, admin: dict = Depends(get_current_admin)):
     """
     logger.info("Delete event request received id=%s", event_id)
 
-    db_event = await models.DBDepartmentEvent.find_one(models.DBDepartmentEvent.id == event_id)
+    obj_id = to_object_id(event_id)
+    if not obj_id:
+        logger.warning("Delete event rejected: invalid id=%s", event_id)
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    db_event = await models.DBDepartmentEvent.get(obj_id)
     if not db_event:
         logger.warning("Delete event rejected: event not found id=%s", event_id)
         raise HTTPException(status_code=404, detail="Event not found")

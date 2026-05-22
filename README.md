@@ -32,8 +32,8 @@
 | **Routing** | React Router DOM | 7.10.1 |
 | **Icons** | Lucide React | 0.556.0 |
 | **Backend** | FastAPI + Uvicorn | 0.136.0 |
-| **ORM** | SQLAlchemy | 2.0.49 |
-| **Database** | SQLite | — |
+| **ODM** | Beanie | 1.28.0 |
+| **Database** | MongoDB | 5.0+ |
 | **AI** | Google Generative AI (`google-genai`) | 1.73.1 |
 | **Validation** | Pydantic + email-validator | 2.13.3 |
 
@@ -51,7 +51,7 @@ Automated-MCA/
 │   ├── models.py            # ODM Database models
 │   ├── schemas.py           # Pydantic validation schemas
 │   ├── test_main.py         # Pytest API test cases
-│   └── requirement.txt      # Python backend dependencies
+│   └── requirements.txt     # Python backend dependencies
 │
 ├── frontend/                # React (Vite) Frontend Application
 │   ├── components/          # Reusable UI widgets and pages components
@@ -75,7 +75,14 @@ Automated-MCA/
 
 - **Node.js** v18+ and **npm**
 - **Python** 3.9+ with **pip**
+- **MongoDB** v5.0+ (running locally or via a remote MongoDB Atlas cluster)
 - A Google Gemini API key (optional — AI features fall back to mock data without it)
+
+#### Running MongoDB with Docker (Recommended)
+If you have Docker installed, you can start a local MongoDB instance with:
+```bash
+docker run -d -p 27017:27017 --name mca-mongodb mongo:latest
+```
 
 ### Installation & Setup
 
@@ -101,12 +108,26 @@ Automated-MCA/
    # macOS / Linux
    source venv/bin/activate
    
-   pip install -r requirement.txt
+   pip install -r requirements.txt
+   ```
+   *Alternatively, you can install backend dependencies from the root directory:*
+   ```bash
+   pip install -r requirements.txt
    ```
 
 4. **Configure environment variables**:
    Create a `.env` file inside the `backend/` directory:
    ```env
+   # MongoDB Configuration (defaults to localhost:27017 if not set)
+   MONGODB_URI=mongodb://localhost:27017
+   MONGODB_DB_NAME=mca_greetings
+
+   # Admin Credentials (defaults to admin@mca.com / 1234 if not set)
+   ADMIN_EMAIL=admin@mca.com
+   ADMIN_PASSWORD=1234
+   JWT_SECRET=supersecretkey
+
+   # Google Gemini API key (optional — AI features fall back to mock data if omitted)
    GEMINI_API_KEY=your_gemini_api_key_here
    ```
    Optionally override the API URL for the frontend by creating a `.env` file inside the `frontend/` directory:

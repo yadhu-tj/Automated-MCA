@@ -6,10 +6,11 @@ from typing import Optional
 
 from fastapi import HTTPException, UploadFile
 
-from core.config import APP_DIR, CERTIFICATE_UPLOAD_DIR, PHOTO_UPLOAD_DIR, logger
+from core.config import APP_DIR, CERTIFICATE_UPLOAD_DIR, PHOTO_UPLOAD_DIR, TEMPLATE_UPLOAD_DIR, logger
 
 ALLOWED_PHOTO_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 ALLOWED_CERTIFICATE_TYPES = {"application/pdf", "image/png", "image/jpeg", "image/webp", "image/gif"}
+ALLOWED_TEMPLATE_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 
 
 def get_media_path(url_path: Optional[str]) -> Optional[str]:
@@ -115,5 +116,40 @@ async def save_member_photo(file: UploadFile) -> str:
     url_path = f"/uploads/photos/{file_name}"
     logger.info("Photo uploaded: %s (%s, %d bytes)", url_path, file.content_type, len(contents))
     return url_path
+
+
+async def save_template_background(file: UploadFile) -> str:
+    if file.content_type not in ALLOWED_TEMPLATE_IMAGE_TYPES:
+        raise HTTPException(status_code=400, detail="Only JPEG, PNG, WebP and GIF images are allowed")
+
+    ext_map = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp", "image/gif": ".gif"}
+    extension = ext_map.get(file.content_type, ".jpg")
+    file_name = f"{uuid.uuid4()}{extension}"
+    file_path = TEMPLATE_UPLOAD_DIR / file_name
+
+    MAX_TEMPLATE_SIZE = 10 * 1024 * 1024  # 10MB limit
+    contents = await file.read(MAX_TEMPLATE_SIZE + 1)
+    if len(contents) > MAX_TEMPLATE_SIZE:
+        raise HTTPException(status_code=400, detail="Template background image file size exceeds the 10MB limit")
+
+    file_path.write_bytes(contents)
+
+    url_path = f"/uploads/templates/{file_name}"
+    logger.info("Template background uploaded: %s (%s, %d bytes)", url_path, file.content_type, len(contents))
+    return url_path
+
+
+def delete_template_background(background_image_url: Optional[str]) -> None:
+    if not background_image_url or not background_image_url.startswith("/uploads/templates/"):
+        return
+    try:
+        # Resolve to absolute path and verify it is under TEMPLATE_UPLOAD_DIR
+        file_path = (APP_DIR / background_image_url.lstrip("/")).resolve()
+        file_path.relative_to(TEMPLATE_UPLOAD_DIR.resolve())
+        if file_path.exists():
+            file_path.unlink()
+            logger.info("Deleted template background image: %s", file_path)
+    except ValueError:
+        logger.warning("Prevented attempted template background delete path traversal: %s", background_image_url)
 
 

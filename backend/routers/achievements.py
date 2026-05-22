@@ -1,8 +1,9 @@
-import uuid
+from beanie import PydanticObjectId
 from typing import List
 
 from fastapi import APIRouter, HTTPException, Depends
 from core.auth import get_current_admin
+from database import to_object_id
 
 import models
 import schemas
@@ -23,7 +24,10 @@ async def get_achievements():
 
 @router.get("/{achievement_id}", response_model=schemas.Achievement)
 async def get_achievement(achievement_id: str):
-    achievement = await models.DBAchievement.find_one(models.DBAchievement.id == achievement_id)
+    obj_id = to_object_id(achievement_id)
+    if not obj_id:
+        raise HTTPException(status_code=404, detail="Achievement not found")
+    achievement = await models.DBAchievement.get(obj_id)
     if not achievement:
         raise HTTPException(status_code=404, detail="Achievement not found")
     return achievement
@@ -42,13 +46,18 @@ async def create_achievement(achievement: schemas.AchievementCreate, admin: dict
         achievement.certificateGenerated,
     )
 
-    member = await models.DBMember.find_one(models.DBMember.id == achievement.memberId)
+    member_obj_id = to_object_id(achievement.memberId)
+    if not member_obj_id:
+        logger.warning("Create achievement rejected: invalid memberId=%s", achievement.memberId)
+        raise HTTPException(status_code=404, detail="Member not found")
+    member = await models.DBMember.get(member_obj_id)
     if not member:
         logger.warning("Create achievement rejected: member not found memberId=%s", achievement.memberId)
         raise HTTPException(status_code=404, detail="Member not found")
 
+    achievement_id = PydanticObjectId()
     achievement_dict = achievement.model_dump()
-    achievement_dict["id"] = str(uuid.uuid4())
+    achievement_dict["id"] = achievement_id
     certificate_file_data = achievement_dict.pop("certificateFileData", None)
 
     if certificate_file_data and not achievement_dict.get("certificateGenerated"):
@@ -62,7 +71,7 @@ async def create_achievement(achievement: schemas.AchievementCreate, admin: dict
         if not achievement_dict.get("certificateFileName") or not achievement_dict.get("certificateMimeType"):
             raise HTTPException(status_code=400, detail="Certificate file name and MIME type are required")
         stored_name, stored_path, stored_mime = save_certificate_attachment(
-            achievement_dict["id"],
+            str(achievement_id),
             achievement_dict["certificateFileName"],
             achievement_dict["certificateMimeType"],
             certificate_file_data,
@@ -89,12 +98,20 @@ async def update_achievement(achievement_id: str, achievement: schemas.Achieveme
         achievement.status,
     )
 
-    db_achievement = await models.DBAchievement.find_one(models.DBAchievement.id == achievement_id)
+    obj_id = to_object_id(achievement_id)
+    if not obj_id:
+        logger.warning("Update achievement rejected: invalid id=%s", achievement_id)
+        raise HTTPException(status_code=404, detail="Achievement not found")
+    db_achievement = await models.DBAchievement.get(obj_id)
     if not db_achievement:
         logger.warning("Update achievement rejected: achievement not found id=%s", achievement_id)
         raise HTTPException(status_code=404, detail="Achievement not found")
 
-    member = await models.DBMember.find_one(models.DBMember.id == achievement.memberId)
+    member_obj_id = to_object_id(achievement.memberId)
+    if not member_obj_id:
+        logger.warning("Update achievement rejected: invalid memberId=%s", achievement.memberId)
+        raise HTTPException(status_code=404, detail="Member not found")
+    member = await models.DBMember.get(member_obj_id)
     if not member:
         logger.warning("Update achievement rejected: member not found memberId=%s", achievement.memberId)
         raise HTTPException(status_code=404, detail="Member not found")
@@ -144,7 +161,11 @@ async def delete_achievement(achievement_id: str, admin: dict = Depends(get_curr
     """
     logger.info("Delete achievement request received id=%s", achievement_id)
 
-    db_achievement = await models.DBAchievement.find_one(models.DBAchievement.id == achievement_id)
+    obj_id = to_object_id(achievement_id)
+    if not obj_id:
+        logger.warning("Delete achievement rejected: invalid id=%s", achievement_id)
+        raise HTTPException(status_code=404, detail="Achievement not found")
+    db_achievement = await models.DBAchievement.get(obj_id)
     if not db_achievement:
         logger.warning("Delete achievement rejected: achievement not found id=%s", achievement_id)
         raise HTTPException(status_code=404, detail="Achievement not found")

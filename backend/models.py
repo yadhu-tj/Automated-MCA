@@ -1,10 +1,7 @@
-import uuid
 from typing import Optional
 from beanie import Document, before_event, Delete
-from pydantic import Field
 
 class DBMember(Document):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     email: str
     role: str
@@ -19,7 +16,7 @@ class DBMember(Document):
         from backend_services.file_storage import delete_certificate_attachment, delete_member_photo
         
         # Cascade delete achievements
-        achievements = await DBAchievement.find(DBAchievement.memberId == self.id).to_list()
+        achievements = await DBAchievement.find(DBAchievement.memberId == str(self.id)).to_list()
         for achievement in achievements:
             delete_certificate_attachment(achievement.certificateFilePath)
             await achievement.delete()
@@ -35,11 +32,15 @@ class DBMember(Document):
 
 
 class DBTemplate(Document):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     category: str
     content: str
     backgroundImage: Optional[str] = None
+
+    @before_event(Delete)
+    async def cleanup_associated_resources(self):
+        from backend_services.file_storage import delete_template_background
+        delete_template_background(self.backgroundImage)
 
     class Settings:
         name = "templates"
@@ -48,7 +49,6 @@ class DBTemplate(Document):
         ]
 
 class DBDepartmentEvent(Document):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
     date: str
     type: str
@@ -62,7 +62,6 @@ class DBDepartmentEvent(Document):
         ]
 
 class DBAchievement(Document):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     memberId: str
     title: str
     description: str

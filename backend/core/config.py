@@ -12,9 +12,11 @@ APP_DIR = Path(__file__).resolve().parent.parent
 UPLOAD_ROOT = APP_DIR / "uploads"
 CERTIFICATE_UPLOAD_DIR = UPLOAD_ROOT / "certificates"
 PHOTO_UPLOAD_DIR = UPLOAD_ROOT / "photos"
+TEMPLATE_UPLOAD_DIR = UPLOAD_ROOT / "templates"
 
 CERTIFICATE_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 PHOTO_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+TEMPLATE_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 CORS_ORIGINS = [
     "http://localhost:3000",

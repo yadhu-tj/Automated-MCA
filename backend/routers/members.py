@@ -2,6 +2,7 @@ import uuid
 from typing import List
 from fastapi import APIRouter, File, HTTPException, UploadFile, Depends
 from core.auth import get_current_admin
+from database import to_object_id
 
 import models
 import schemas
@@ -56,9 +57,6 @@ async def create_member(member: schemas.MemberCreate, admin: dict = Depends(get_
             member_dict["photoUrl"],
         )
 
-    if "id" not in member_dict or not member_dict["id"]:
-        member_dict["id"] = str(uuid.uuid4())
-
     logger.debug("Persisting member payload: %s", member_dict)
     db_member = models.DBMember(**member_dict)
     await db_member.insert()
@@ -80,14 +78,19 @@ async def update_member(member_id: str, member: schemas.MemberCreate, admin: dic
         bool(member.photoUrl),
     )
 
-    db_member = await models.DBMember.find_one(models.DBMember.id == member_id)
+    obj_id = to_object_id(member_id)
+    if not obj_id:
+        logger.warning("Update member rejected: invalid id=%s", member_id)
+        raise HTTPException(status_code=404, detail="Member not found")
+
+    db_member = await models.DBMember.get(obj_id)
     if not db_member:
         logger.warning("Update member rejected: member not found id=%s", member_id)
         raise HTTPException(status_code=404, detail="Member not found")
 
     duplicate_email = await models.DBMember.find_one(
         models.DBMember.email == member.email,
-        models.DBMember.id != member_id
+        models.DBMember.id != obj_id
     )
     if duplicate_email:
         logger.warning(
@@ -123,7 +126,12 @@ async def delete_member(member_id: str, admin: dict = Depends(get_current_admin)
     """
     logger.info("Delete member request received for id=%s", member_id)
 
-    db_member = await models.DBMember.find_one(models.DBMember.id == member_id)
+    obj_id = to_object_id(member_id)
+    if not obj_id:
+        logger.warning("Delete member rejected: invalid id=%s", member_id)
+        raise HTTPException(status_code=404, detail="Member not found")
+
+    db_member = await models.DBMember.get(obj_id)
     if not db_member:
         logger.warning("Delete member rejected: member not found id=%s", member_id)
         raise HTTPException(status_code=404, detail="Member not found")
@@ -151,9 +159,6 @@ async def create_members_bulk(members: List[schemas.MemberCreate], admin: dict =
         member_dict = member.model_dump()
         if not member_dict.get("photoUrl"):
             member_dict["photoUrl"] = build_default_photo_url(member_dict["name"])
-        if "id" not in member_dict or not member_dict["id"]:
-            member_dict["id"] = str(uuid.uuid4())
-
         db_member = models.DBMember(**member_dict)
         await db_member.insert()
         created_members.append(db_member)

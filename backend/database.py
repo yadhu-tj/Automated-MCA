@@ -1,4 +1,6 @@
 import os
+from typing import Optional
+from beanie import PydanticObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 
 MONGODB_URI = os.environ.get("MONGODB_URI", "mongodb://localhost:27017")
@@ -11,3 +13,10 @@ db = client[MONGODB_DB_NAME]
 # Dependency for FastAPI routes
 def get_db():
     yield db
+
+def to_object_id(id_str: str) -> Optional[PydanticObjectId]:
+    try:
+        return PydanticObjectId(id_str)
+    except Exception:
+        return None
+

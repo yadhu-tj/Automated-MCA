@@ -1,8 +1,10 @@
 import uuid
 from typing import List
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File
 from core.auth import get_current_admin
+from database import to_object_id
+from backend_services.file_storage import save_template_background, delete_template_background
 
 import models
 import schemas
@@ -27,7 +29,6 @@ async def create_template(template: schemas.TemplateCreate, admin: dict = Depend
     logger.info("Create template request received name=%s category=%s", template.name, template.category)
 
     template_dict = template.model_dump()
-    template_dict["id"] = str(uuid.uuid4())
 
     db_template = models.DBTemplate(**template_dict)
     await db_template.insert()
@@ -41,18 +42,39 @@ async def update_template(template_id: str, template: schemas.TemplateCreate, ad
     """
     logger.info("Update template request received id=%s name=%s category=%s", template_id, template.name, template.category)
 
-    db_template = await models.DBTemplate.find_one(models.DBTemplate.id == template_id)
+    obj_id = to_object_id(template_id)
+    if not obj_id:
+        logger.warning("Update template rejected: invalid id=%s", template_id)
+        raise HTTPException(status_code=404, detail="Template not found")
+
+    db_template = await models.DBTemplate.get(obj_id)
     if not db_template:
         logger.warning("Update template rejected: template not found id=%s", template_id)
         raise HTTPException(status_code=404, detail="Template not found")
 
     template_dict = template.model_dump()
+    old_bg = db_template.backgroundImage
+    new_bg = template_dict.get("backgroundImage")
+
+    # If the background image changed, delete the old local file
+    if old_bg and old_bg != new_bg:
+        delete_template_background(old_bg)
+
     for field, value in template_dict.items():
         if field != "id":
             setattr(db_template, field, value)
 
     await db_template.save()
     return db_template
+
+
+@router.post("/upload-background")
+async def upload_background(file: UploadFile = File(...), admin: dict = Depends(get_current_admin)):
+    """
+    Upload a background image for templates.
+    """
+    url_path = await save_template_background(file)
+    return {"backgroundImage": url_path}
 
 
 @router.delete("/{template_id}")
@@ -62,7 +84,12 @@ async def delete_template(template_id: str, admin: dict = Depends(get_current_ad
     """
     logger.info("Delete template request received id=%s", template_id)
 
-    db_template = await models.DBTemplate.find_one(models.DBTemplate.id == template_id)
+    obj_id = to_object_id(template_id)
+    if not obj_id:
+        logger.warning("Delete template rejected: invalid id=%s", template_id)
+        raise HTTPException(status_code=404, detail="Template not found")
+
+    db_template = await models.DBTemplate.get(obj_id)
     if not db_template:
         logger.warning("Delete template rejected: template not found id=%s", template_id)
         raise HTTPException(status_code=404, detail="Template not found")

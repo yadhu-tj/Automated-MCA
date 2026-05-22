@@ -1,5 +1,7 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
-from typing import Optional
+from pydantic import BaseModel, ConfigDict, EmailStr, BeforeValidator
+from typing import Annotated, Optional
+
+PyObjectId = Annotated[str, BeforeValidator(str)]
 
 
 class LoginRequest(BaseModel):
@@ -31,7 +33,7 @@ class MemberCreate(MemberBase):
 class Member(MemberBase):
     model_config = ConfigDict(from_attributes=True)
 
-    id: str
+    id: PyObjectId
     photoUrl: str
 
 
@@ -50,7 +52,7 @@ class EventCreate(EventBase):
 class Event(EventBase):
     model_config = ConfigDict(from_attributes=True)
 
-    id: str
+    id: PyObjectId
 
 
 class TemplateBase(BaseModel):
@@ -67,7 +69,7 @@ class TemplateCreate(TemplateBase):
 class Template(TemplateBase):
     model_config = ConfigDict(from_attributes=True)
 
-    id: str
+    id: PyObjectId
 
 
 class AchievementBase(BaseModel):
@@ -90,4 +92,4 @@ class AchievementCreate(AchievementBase):
 class Achievement(AchievementBase):
     model_config = ConfigDict(from_attributes=True)
 
-    id: str
+    id: PyObjectId
